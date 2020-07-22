@@ -1,10 +1,7 @@
-import React, { Component } from "react";
+import React, { useState } from "react";
 import SceneryCard from "./components/SceneryCard";
 import Wrapper from "./components/Wrapper";
-import scenerys from "./scenery.json";
-import {
-  BrowserRouter as Router
-} from "react-router-dom";
+import initialScenerys from "./scenery.json";
 import Navbar from "./components/Navbar";
 import Instructions from "./components/Instructions";
 
@@ -16,88 +13,82 @@ function randomScenerys(array) {
   return array
 }
 
-class App extends Component {
-  state = {
-    scenerys,
-    score: 0,
-    highScore: 0,
-    clicked: [],
-    outcome: ""
-  };
+const App = () => {
 
-  clickHandler = id => {
-    if (this.state.clicked.indexOf(id) === -1) {
-      this.incrementHandler()
-      this.setState({ clicked: this.state.clicked.concat(id) })
+  const [scenerys, setScenerys] = useState(initialScenerys);
+  const [score, setScore] = useState(0);
+  const [highScore, setHighScore] = useState(0);
+  const [clicked, setClicked] = useState([]);
+  const [outcome, setOutcome] = useState("");
+
+  const clickHandler = id => {
+    if (clicked.indexOf(id) === -1) {
+      incrementHandler()
+      setClicked(clicked.concat(id))
     }
     else {
-      this.resetScore()
+      resetScore()
     }
   }
 
-  incrementHandler = () => {
-    const newScore = this.state.score + 1
-   
-    this.setState({
-      score: newScore,
-      outcome: ""
-    })
-   
-    if (newScore >= this.state.highScore) {
-      this.setState({ highScore: newScore })
+  const incrementHandler = () => {
+    const newScore = score + 1
+
+    setScore(newScore) 
+    setOutcome("")
+    
+
+    if (newScore >= highScore) {
+      setHighScore(newScore)
     }
-   
+
     else if (newScore === 24) {
-      this.setState({ outcome: "You win!" })
+      setOutcome("You Win!")
     }
-    this.shuffle()
+    shuffle()
   }
 
-  resetScore = () => {
-    this.setState({
-      score: 0,
-      highScore: this.state.highScore,
-      outcome: "You lost! Click any image to restart!",
-      clicked: []
-    })
+  const resetScore = () => {
+    setScore(0)
+    setHighScore(highScore)
+    setOutcome("You lost! Click any image to restart!")
+    setClicked([])
   }
 
-  shuffle = () => {
+  const shuffle = () => {
     let shuffledScenerys = randomScenerys(scenerys)
-    this.setState({ scenerys: shuffledScenerys })
+    setScenerys(shuffledScenerys)
   }
 
-  render() {
+  
     return (
       <Wrapper>
-        <Router>
-          <main className="App">
-            <Navbar />
-          </main>
-          <header>
-            <Instructions />
-          </header>
-        </Router>
+        <main className="App">
+          <Navbar />
+        </main>
+
+        <header>
+          <Instructions />
+        </header>
         <h3>
-          Score: {this.state.score} <br/>
-          High Score: {this.state.highScore}
+          Score: {score} <br />
+          High Score: {highScore}
         </h3>
-        <h5> {this.state.outcome} </h5>
-        {this.state.scenerys.map(scenery => (
+        <h5> {outcome} </h5>
+        {scenerys.map(scenery => (
           <div>
             <SceneryCard
               id={scenery.id}
               key={scenery.id}
               image={scenery.image}
-              shuffle={this.shuffle}
-              clickHandler={this.clickHandler}
-              incrementHandler={this.incrementHandler}
+              shuffle={shuffle}
+              clickHandler={clickHandler}
+              incrementHandler={incrementHandler}
             />
           </div>
         )).slice(0, 12)}
       </Wrapper>
     );
-  }
 }
 
 export default App;
